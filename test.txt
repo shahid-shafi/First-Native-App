@@ -1,0 +1,5 @@
+Tuesday 17-OCT-2023
+Today's Task Update
+
+* integrated firebase firestore
+* Completed Crud operation
