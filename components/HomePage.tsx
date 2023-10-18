@@ -1,49 +1,55 @@
 import React, {useEffect, useState} from 'react';
 import {Text, View, StyleSheet, ScrollView, Pressable} from 'react-native';
-import {deleteData, getAllDocuments} from '../utils/firestore.crud';
+import {deleteData, getAllFirestoreDocs} from '../utils/firestore.crud';
 import Post from './Post';
 import LinearGradient from 'react-native-linear-gradient';
 import Toast from 'react-native-toast-message';
+import {useAppSelector} from '../hooks/reduxHooks';
 
 const HomePage = (props: any) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    const fetchDocuments = async () => {
-      try {
-        const data = await getAllDocuments('posts');
+  const user = useAppSelector(state => state.user.user);
+  console.log({user});
+
+  const fetchDocuments = async () => {
+    try {
+      getAllFirestoreDocs('posts', (data: any) => {
         setPosts(data);
-      } catch (error: any) {
-        Toast.show({
-          type: 'error',
-          text1: error.message || 'something went wrong',
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
+      });
+    } catch (error: any) {
+      Toast.show({
+        type: 'error',
+        text1: error.message || 'something went wrong',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchDocuments();
   }, []);
 
   const handleDeletePost = async (id: string) => {
     try {
       const response = (await deleteData('posts', id)) as any;
-      if (response === 'null') {
+      if (response === null) {
         Toast.show({
-          type: 'error',
-          text1: 'Something went wrong',
+          type: 'success',
+          text1: 'Post deleted successfully',
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       Toast.show({
         type: 'error',
-        text1: 'Something went wrong',
+        text1: error.message || 'Something went wrong',
       });
     }
   };
 
   const handlePostUpdate = (post: any) => {
-    props.navigation.navigate('new-posts', post);
+    props.navigation.navigate('new-post', {post});
   };
 
   return (
@@ -109,14 +115,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   spinnerText: {fontSize: 32},
-  scroll: {height: '100%'},
+  scroll: {height: '100%', backgroundColor: '#ddd'},
   container: {
     flex: 1,
     padding: 16,
     flexDirection: 'column',
     gap: 8,
     justifyContent: 'flex-start',
-    backgroundColor: '#ddd',
   },
   image: {
     width: 100,
@@ -159,6 +164,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   textPressed: {
-    color: 'black', // Change text color when pressed
+    color: 'black',
   },
 });

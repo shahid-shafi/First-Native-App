@@ -6,18 +6,15 @@ import LinearGradient from 'react-native-linear-gradient';
 const Post = ({post, postId, handleDeletePost, handlePostUpdate}: any) => {
   return (
     <LinearGradient
-      colors={['#12c2e9', '#c471ed', '#f64f59']}
+      colors={['#a64f59', '#d64f59', '#f64f59']}
+      start={{x: 0, y: 0}}
       useAngle
-      angle={315}
+      angle={52}
       style={styles.postContainer}
       key={postId}>
       <Text style={styles.author}>
         {moment(post.date).startOf('seconds').fromNow()}
       </Text>
-      <Text style={styles.author}>
-        {moment.utc(post.date).startOf('seconds').fromNow()}
-      </Text>
-      <Text style={styles.author}>{moment(post.date).format('lll')}</Text>
       <Text style={styles.text}>{post?.title}</Text>
       <Text style={styles.text}>{post?.description}</Text>
       <Text style={styles.author}>{post?.user}</Text>
@@ -33,7 +30,7 @@ export default Post;
 
 const styles = StyleSheet.create({
   text: {
-    color: '#000',
+    color: '#eee',
   },
   postContainer: {
     padding: 10,
@@ -43,7 +40,7 @@ const styles = StyleSheet.create({
   },
   author: {
     textAlign: 'right',
-    color: '#000',
+    color: '#eee',
     fontSize: 12,
   },
   btnContainer: {flexDirection: 'row', justifyContent: 'space-between'},

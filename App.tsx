@@ -6,12 +6,13 @@ import HomePage from './components/HomePage';
 import SignUpPage from './components/SignUpPage';
 import AddNewPost from './components/FireStore/AddNewPost';
 import Toast from 'react-native-toast-message';
+import {toastConfig} from './components/common/ToastConfig';
 
 const Screens = [
-  {name: 'login', component: LogInPage, options: {headerShown: false}},
-  {name: 'sign-up', component: SignUpPage, options: {headerShown: false}},
-  {name: 'home', component: HomePage, options: {headerShown: false}},
-  {name: 'new-post', component: AddNewPost, options: {headerShown: false}},
+  {name: 'login', component: LogInPage, options: {headerShown: true}},
+  {name: 'sign-up', component: SignUpPage, options: {headerShown: true}},
+  {name: 'home', component: HomePage, options: {headerShown: true}},
+  {name: 'new-post', component: AddNewPost, options: {headerShown: true}},
 ];
 
 function App() {
@@ -19,7 +20,7 @@ function App() {
 
   return (
     <NavigationContainer>
-      <Navigator initialRouteName="home">
+      <Navigator initialRouteName="sign-up">
         {Screens.map(screen => (
           <Screen
             key={screen?.name}
@@ -29,7 +30,7 @@ function App() {
           />
         ))}
       </Navigator>
-      <Toast />
+      <Toast config={toastConfig} />
     </NavigationContainer>
   );
 }

@@ -2,7 +2,8 @@
 import React, {useState} from 'react';
 import {StyleSheet, Text, TextInput, View, Button} from 'react-native';
 import * as yup from 'yup';
-import {firebaseSignUp} from '../utils/firebaseAuth';
+import {useAppDispatch} from 'react-redux';
+import { signUp } from '../firebase/firebaseAuth';
 
 const validationSchema = yup.object().shape({
   // name: yup.string().min(3).required('Name is required'),
@@ -31,6 +32,7 @@ interface formField {
 const initialValues = {email: '', password: ''};
 
 const SignUpPage = (props: any) => {
+  const dispatch = useAppDispatch();
   const [formValues, setFormValues] = useState<any>(initialValues);
   const [errors, setErrors] = useState<any>(initialValues);
 
@@ -41,11 +43,9 @@ const SignUpPage = (props: any) => {
   const handleSubmit = async () => {
     try {
       await validationSchema.validate(formValues, {abortEarly: false});
-      console.log(formValues);
       const {email, password} = formValues;
-      const response = await firebaseSignUp(email, password);
+      const response = dispatch(signUp(email, password));
       if (response.additionalUserInfo?.isNewUser) {
-        console.log(response.user);
         props.navigation.navigate('login');
       }
     } catch (error: any) {
@@ -117,9 +117,11 @@ const styles = StyleSheet.create({
   },
 });
 
-{/* <Image
+{
+  /* <Image
   style={styles.image}
   source={{
     uri: 'https://img.freepik.com/free-icon/user_318-159711.jpg',
   }}
-/>; */}
+/>; */
+}

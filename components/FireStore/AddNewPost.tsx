@@ -1,20 +1,33 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
-import {TextInput} from 'react-native-gesture-handler';
-import {addNewDocument} from '../../utils/firestore.crud';
+import {addNewDocument, updateData} from '../../utils/firestore.crud';
 import Toast from 'react-native-toast-message';
+import InputField from '../common/InputField';
 
 const AddNewPost = (props: any) => {
+  const post = props?.route?.params?.post || null;
   const [newPost, setNewPost] = useState({
     title: '',
     description: '',
     user: '',
-    date: new Date(),
+    date: new Date().toUTCString(),
   });
+
+  useEffect(() => {
+    if (post) {
+      setNewPost({
+        title: post?.title,
+        description: post?.description,
+        user: post?.user,
+        date: post?.date,
+      });
+    }
+  }, [post]);
 
   const handleInputChange = (key: string, value: string) => {
     setNewPost(prev => ({...prev, [key]: value}));
   };
+
   const handleAddNewDocument = async () => {
     try {
       if (!newPost.title) {
@@ -27,13 +40,15 @@ const AddNewPost = (props: any) => {
         throw new Error('User is required');
       }
 
-      const response = await addNewDocument('posts', newPost);
+      const response = post
+        ? await updateData('posts', post.id, newPost)
+        : await addNewDocument('posts', newPost);
 
-      if (response) {
+      if (response?.status) {
         Toast.show({
           type: 'success',
-          text1: 'Toast Message',
-          text2: 'Post Added Successfully',
+          text1: 'Success',
+          text2: post ? 'Post Updated Successfully' : 'Post Added Successfully',
           autoHide: true,
           visibilityTime: 2500,
         });
@@ -45,28 +60,47 @@ const AddNewPost = (props: any) => {
     }
   };
 
+  const fields = [
+    {
+      title: 'title',
+      placeholder: 'Title',
+      placeholderTextColor: '#999',
+      styles: styles.input,
+    },
+    {
+      title: 'description',
+      placeholder: 'Description',
+      placeholderTextColor: '#999',
+      styles: styles.input,
+    },
+    {
+      title: 'user',
+      placeholder: 'User',
+      placeholderTextColor: '#999',
+      styles: styles.input,
+    },
+  ];
+
+  interface NewPost {
+    title: string;
+    description: string;
+    user: string;
+  }
+
   return (
     <View style={styles.pageContainer}>
       <Text style={styles.pageHeading}>Add New Post</Text>
       <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="Title"
-          style={styles.input}
-          onChangeText={text => handleInputChange('title', text)}
-          placeholderTextColor="#999"
-        />
-        <TextInput
-          placeholder="Description"
-          style={styles.input}
-          onChangeText={text => handleInputChange('description', text)}
-          placeholderTextColor="#999"
-        />
-        <TextInput
-          placeholder="User"
-          style={styles.input}
-          onChangeText={text => handleInputChange('user', text)}
-          placeholderTextColor="#999"
-        />
+        {fields.map((field: any) => (
+          <InputField
+            key={field.title}
+            value={newPost[field?.title as keyof NewPost] || undefined}
+            placeholder={field.placeholder}
+            style={field.styles}
+            onChangeText={text => handleInputChange(field.title, text)}
+            placeholderTextColor={field.placeholderTextColor}
+          />
+        ))}
         <Pressable
           onPress={handleAddNewDocument}
           style={({pressed}: any) => [
@@ -75,7 +109,7 @@ const AddNewPost = (props: any) => {
           ]}>
           {({pressed}) => (
             <Text style={[styles.buttonText, pressed && styles.textPressed]}>
-              Add New Post
+              {post ? 'Update Post' : 'Add New Post'}
             </Text>
           )}
         </Pressable>

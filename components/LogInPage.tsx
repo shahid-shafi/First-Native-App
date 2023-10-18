@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {StyleSheet, Text, TextInput, View, Button} from 'react-native';
 import * as yup from 'yup';
-import {firebaseSignIn} from '../utils/firebaseAuth';
+import {firebaseSignIn} from '../firebase/firebaseAuth';
 import {saveLocalData} from '../utils/asyncStorage.service';
 
 const validationSchema = yup.object().shape({
